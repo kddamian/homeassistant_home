@@ -1,0 +1,401 @@
+alias: Anteroom (off function)
+trigger:
+  - platform: state
+    entity_id: light.a_bulb_1
+    from: 'on'
+    to: 'off'
+action:
+  - service: light.turn_off
+    entity_id:
+      - light.a_bulb_1
+  - service: light.turn_off
+    entity_id:
+      - light.a_bulb_2
+mode: single
+
+alias: Anteroom (on function)
+trigger:
+  - platform: state
+    entity_id: light.a_bulb_1
+    from: 'off'
+    to: 'on'
+action:
+  - service: light.turn_on
+    entity_id:
+      - light.a_bulb_1
+  - service: light.turn_on
+    entity_id:
+      - light.a_bulb_2
+mode: single
+
+alias: Close covers in bedroom at 23:00
+trigger:
+  - platform: time
+    at: '23:00'
+action:
+  - service: cover.close_cover
+    entity_id: cover.b_blind_1
+  - service: cover.close_cover
+    entity_id: cover.b_blind_2
+mode: single
+
+alias: Corridor lights night mode
+trigger:
+  - platform: state
+    entity_id: light.c_bulb_1
+    from: 'off'
+    to: 'on'
+condition:
+  - condition: time
+    after: '23:45:00'
+    before: '06:29:59'
+action:
+  - service: light.turn_on
+    data:
+      brightness_pct: 1
+    target:
+      entity_id:
+        - light.c_bulb_1
+  - service: switch.turn_off
+    entity_id:
+      - switch.corridor
+
+alias: Keep corridor lights on during day (off function)
+trigger:
+  - platform: state
+    entity_id: light.c_bulb_1
+    from: 'on'
+    to: 'off'
+condition:
+  - condition: time
+    after: '06:30:00'
+    before: '23:44:59'
+action:
+  - service: light.turn_off
+    entity_id:
+      - light.c_bulb_1
+  - service: switch.turn_off
+    entity_id:
+      - switch.corridor
+mode: single
+
+alias: Keep corridor lights on during day (on function)
+trigger:
+  - platform: state
+    entity_id: light.c_bulb_1
+    from: 'off'
+    to: 'on'
+condition:
+  - condition: time
+    after: '06:30:00'
+    before: '23:44:59'
+action:
+  - service: light.turn_on
+    data:
+      brightness_pct: 100
+    target:
+      entity_id:
+        - light.c_bulb_1
+  - service: switch.turn_on
+    entity_id:
+      - switch.corridor
+mode: single
+
+alias: Open covers in bedroom automatically during weekends
+trigger:
+  - platform: time
+    at: '09:00:00'
+condition:
+  - condition: time
+    weekday:
+      - sat
+      - sun
+action:
+  - service: cover.set_cover_position
+    entity_id:
+      - cover.b_blind_1
+      - cover.b_blind_2
+    data:
+      position: 25
+mode: single
+
+alias: Play music when Yamaha switch is on
+trigger:
+  - platform: state
+    entity_id: switch.yamaha_speakers
+    from: 'off'
+    to: 'on'
+action:
+  - service: media_player.play_media
+    data:
+      media_content_id: http://195.150.20.4:8000/rmf_fm
+      media_content_type: music
+    target:
+      entity_id:
+        - media_player.chromecastaudio8178
+  - service: media_player.volume_set
+    data:
+      volume_level: 0.08
+    target:
+      entity_id:
+        - media_player.chromecastaudio8178
+mode: single
+
+alias: Restart Home Assistant during night
+trigger:
+  - platform: time
+    at: '04:00:00'
+action:
+  - service: homeassistant.restart
+    data: {}
+
+alias: Stream to Sonos when mechanical ventilation is on
+trigger:
+  - platform: state
+    entity_id: switch.mechanical_ventilation
+    from: 'off'
+    to: 'on'
+    for: '00:00:55'
+action:
+  - service: media_player.select_source
+    data:
+      entity_id: media_player.bathroom_speaker
+      source: RMF FM
+mode: single
+
+alias: Turn off laundry fan at 06:00
+trigger:
+  - platform: time
+    at: '06:00'
+action:
+  - service: switch.turn_off
+    entity_id: switch.laundry
+mode: single
+
+alias: Turn on bar light when TV light is on (off function)
+trigger:
+  - platform: state
+    entity_id: switch.tv_light
+    from: 'on'
+    to: 'off'
+  - platform: state
+    entity_id: switch.bar_light
+    from: 'on'
+    to: 'off'
+action:
+  - service: switch.turn_off
+    entity_id:
+      - switch.bar_light
+      - switch.tv_light
+mode: single
+
+alias: Turn on bar light when TV light is on (on function)
+trigger:
+  - platform: state
+    entity_id: switch.tv_light
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: switch.bar_light
+    from: 'off'
+    to: 'on'
+action:
+  - service: switch.turn_on
+    entity_id:
+      - switch.bar_light
+      - switch.tv_light
+mode: single
+
+alias: Turn on garden lights 1hr 30min before sunrise (off function)
+trigger:
+  - platform: sun
+    event: sunrise
+action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+        - light.g_bulb_1
+        - light.f_bulb_1
+mode: single
+
+alias: Turn on garden lights 1hr 30min before sunrise (on function)
+trigger:
+  - platform: sun
+    event: sunrise
+    offset: '-01:30:00'
+action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id:
+        - light.g_bulb_1
+        - light.f_bulb_1
+mode: single
+
+alias: Turn on garden lights 30 minutes after sunset (off function)
+trigger:
+  - platform: time
+    at: '23:59:59'
+action:
+  - service: light.turn_off
+    data: {}
+    target:
+      entity_id:
+        - light.g_bulb_1
+        - light.f_bulb_1
+mode: single
+
+alias: Turn on garden lights 30 minutes after sunset (on function)
+trigger:
+  - platform: sun
+    event: sunset
+    offset: '+00:30:00'
+action:
+  - service: light.turn_on
+    data: {}
+    target:
+      entity_id:
+        - light.g_bulb_1
+        - light.f_bulb_1
+mode: single
+
+alias: Turn on light under cabinets when lights in living room are on (off function)
+trigger:
+  - platform: state
+    entity_id: light.lr_bulb_color_3
+    from: 'on'
+    to: 'off'
+action:
+  - service: switch.turn_off
+    entity_id:
+      - switch.tv_light
+mode: single
+
+alias: Turn on light under cabinets when lights in living room are on (on function)
+trigger:
+  - platform: state
+    entity_id: light.lr_bulb_color_3
+    from: 'off'
+    to: 'on'
+action:
+  - service: switch.turn_on
+    entity_id:
+      - switch.tv_light
+mode: single
+
+alias: Turn on mechanical ventilation for 30 minutes
+trigger:
+  - platform: state
+    entity_id: switch.mechanical_ventilation
+    from: 'off'
+    to: 'on'
+action:
+  - service: timer.start
+    data:
+      entity_id: timer.whole_house
+      duration: '00:30:00'
+  - delay:
+      seconds: 1800
+  - service: switch.turn_off
+    entity_id: switch.mechanical_ventilation
+mode: single
+
+alias: Turn on night lights when bulb is on (off function)
+trigger:
+  - platform: state
+    entity_id: light.b_bulb_1
+    from: 'on'
+    to: 'off'
+  - platform: state
+    entity_id: switch.night_lights
+    from: 'on'
+    to: 'off'
+action:
+  - service: switch.turn_off
+    entity_id:
+      - switch.night_lights
+  - service: light.turn_off
+    entity_id:
+      - light.b_bulb_1
+mode: single
+
+alias: Turn on night lights when bulb is on (on function)
+trigger:
+  - platform: state
+    entity_id: light.b_bulb_1
+    from: 'off'
+    to: 'on'
+  - platform: state
+    entity_id: switch.night_lights
+    from: 'off'
+    to: 'on'
+action:
+  - service: switch.turn_on
+    entity_id:
+      - switch.night_lights
+  - service: light.turn_on
+    entity_id:
+      - light.b_bulb_1
+mode: single
+
+alias: Wake up alarm (advanced)
+trigger:
+  - platform: state
+    entity_id: switch.yamaha_speakers
+    from: 'off'
+    to: 'on'
+condition:
+  - condition: time
+    after: '05:50:00'
+    before: '09:00:00'
+action:
+  - service: cover.set_cover_position
+    entity_id:
+      - cover.b_blind_1
+      - cover.b_blind_2
+    data:
+      position: 20
+  - delay:
+      seconds: 5
+  - service: light.turn_on
+    entity_id: light.b_bulb_1
+  - delay:
+      seconds: 5
+  - service: switch.turn_on
+    entity_id: switch.bar_light
+  - delay:
+      seconds: 5
+  - service: light.turn_on
+    entity_id: light.lr_bulb_color_3
+  - delay:
+      seconds: 5
+  - service: light.turn_on
+    entity_id: light.dr_bulb_color_1
+  - delay:
+      seconds: 600
+  - service: cover.set_cover_position
+    entity_id:
+      - cover.b_blind_1
+      - cover.b_blind_2
+    data:
+      position: 50
+  - delay:
+      seconds: 2400
+  - service: switch.turn_off
+    entity_id:
+      - switch.bar_light
+      - switch.yamaha_speakers
+  - delay:
+      seconds: 1
+  - service: light.turn_off
+    entity_id:
+      - light.b_bulb_1
+      - light.lr_bulb_color_3
+      - light.dr_bulb_color_1
+  - delay:
+      seconds: 1
+  - service: cover.open_cover
+    entity_id:
+      - cover.b_blind_1
+      - cover.b_blind_2
